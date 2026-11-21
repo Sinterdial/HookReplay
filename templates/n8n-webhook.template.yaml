@@ -1,0 +1,98 @@
+# HookReplay n8n Webhook 完整配置模板
+# 特点：内建 /webhook/ 与 /webhook-test/ 双入口预设、Basic Auth、幂等跳过断言与测试报告归档
+
+name: "n8n Webhook 通知回放模板"
+description: "适用于 n8n Webhook 通知转发与多集入库聚合测试"
+
+# 目标 Webhook 地址（顶栏可一键在 /webhook/ 与 /webhook-test/ 之间切换）
+url: "https://n8n.example.com/webhook/demo"
+method: "POST"
+
+# 预设目标入口列表（可在顶栏下拉一键切换环境）
+endpoints:
+  - name: "正式 Webhook"
+    url: "https://n8n.example.com/webhook/demo"
+  - name: "编辑器测试入口"
+    url: "https://n8n.example.com/webhook-test/demo"
+
+# 是否跳过自签名 HTTPS 证书校验（内网自建证书设为 true）
+insecure: true
+
+# 身份认证配置：none / basic / bearer / header / query
+auth:
+  type: "basic"
+  username: "your-username"
+  password: "your-password"
+  token: ""
+  headerName: "X-API-KEY"
+  queryName: "token"
+
+# 自定义请求头
+headers:
+  X-Test-From: "HookReplay"
+
+# 发送流控与逐段确认
+timeoutMs: 15000
+retries: 1
+retryDelayMs: 800
+concurrency: 1 # 入库聚合窗口测试建议保持 1（严格串行）
+delayMs: 100
+segmentWaitMs: 0 # 段间等待毫秒；需要隔离聚合窗口时可设为 35000
+interactive: true # true = 每段发送前弹出交互确认（y/n/a/q）
+markTest: true # true = 自动在请求体 JSON 根注入 __test: true
+
+# 输入日志数据源（相对路径按本配置文件所在目录解析，也可直接填写绝对路径）
+inputs:
+  - "./logs/sample.jsonl"
+recursive: false
+extensions:
+  - "txt"
+  - "log"
+  - "json"
+  - "jsonl"
+format: "auto"
+commentPrefixes:
+  - "#"
+  - "//"
+
+# 筛选与限条控制（留空表示不过滤）
+types: []
+include: ""
+exclude: ""
+limit: 0
+reverse: false
+
+# 摘要提取与响应断言规则
+labelRules:
+  preset: "auto"
+  typePaths:
+    - "type"
+    - "event_type"
+    - "event"
+    - "action"
+    - "status"
+  titlePaths:
+    - "data.mediainfo.title_year"
+    - "data.title"
+    - "data.subscribe_info.name"
+    - "entries[0].title"
+    - "entry.title"
+    - "title"
+    - "name"
+    - "subject"
+
+assertions:
+  expect: [200]
+  softFailStatus: [400]
+  strict: false
+  bodyRules:
+    - path: "deduped"
+      equals: true
+      badge: "幂等跳过"
+      tone: "info"
+
+# 测试报告与历史归档（会在该目录自动生成时间戳历史报告，并兼容写入 latest.json）
+report: "./test_reports/latest.json"
+saveResponseDir: ""
+quiet: false
+variables: {}

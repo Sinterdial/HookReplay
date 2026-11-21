@@ -1,0 +1,105 @@
+# HookReplay 通用 Webhook / REST API 配置模板
+# 特点：支持 Bearer/Header 鉴权、HMAC-SHA256 验签、V2 细粒度 testMark、自定义摘要路径与变量插值
+
+name: "通用 Webhook / REST API 模板"
+description: "适用于 GitHub / Gitea / Grafana / 自建网关等任意 JSON HTTP 回调回放"
+
+# 支持使用 {{VAR}} 引用下方 variables 或系统环境变量
+url: "https://{{API_HOST}}/webhook/events"
+method: "POST"
+
+endpoints:
+  - name: "本地调试网关"
+    url: "http://127.0.0.1:8080/webhook/events"
+  - name: "预发布环境"
+    url: "https://{{API_HOST}}/webhook/events"
+
+insecure: false
+
+# 鉴权配置：支持 none / basic / bearer / header / query
+auth:
+  type: "bearer"
+  token: "{{API_TOKEN}}"
+  headerName: "X-API-KEY"
+  queryName: "token"
+  username: ""
+  password: ""
+
+headers:
+  X-Request-Source: "HookReplay"
+  X-Trace-Id: "{{$uuid}}"
+
+# Webhook 请求体 HMAC 签名（适配 GitHub / Gitea / 自建验签接口）
+signature:
+  enabled: false
+  algorithm: "hmac-sha256"
+  headerName: "X-Hub-Signature-256"
+  prefix: "sha256="
+  secret: "{{WEBHOOK_SECRET}}"
+
+# 精细化测试标记注入（优先于 markTest；可注入到 body 点分路径 / header / query / none）
+testMark:
+  mode: "header"
+  field: "X-HookReplay-Test"
+  value: "true"
+markTest: false
+
+# 发送流控
+timeoutMs: 15000
+retries: 1
+retryDelayMs: 800
+concurrency: 1
+delayMs: 100
+segmentWaitMs: 0
+interactive: true
+
+# 输入数据源
+inputs:
+  - "./logs/events.jsonl"
+recursive: false
+extensions:
+  - "txt"
+  - "log"
+  - "json"
+  - "jsonl"
+format: "auto"
+commentPrefixes:
+  - "#"
+  - "//"
+
+types: []
+include: ""
+exclude: ""
+limit: 0
+reverse: false
+
+# 通用摘要路径规则（strictly generic 或 auto）
+labelRules:
+  preset: "generic"
+  typePaths:
+    - "event"
+    - "event_type"
+    - "type"
+    - "action"
+  titlePaths:
+    - "title"
+    - "subject"
+    - "repository.full_name"
+    - "alerts[0].labels.alertname"
+    - "name"
+
+assertions:
+  expect: [200, 201, 202, 204]
+  softFailStatus: [400, 422]
+  strict: false
+  bodyRules: []
+
+report: "./test_reports/latest.json"
+saveResponseDir: ""
+quiet: false
+
+# 模板环境变量（内置动态占位符：{{$timestamp}} / {{$timestampMs}} / {{$isoTime}} / {{$uuid}}）
+variables:
+  API_HOST: "api.example.com"
+  API_TOKEN: "replace-with-your-token"
+  WEBHOOK_SECRET: "replace-with-your-secret"

@@ -1,0 +1,16 @@
+# HookReplay 精简快速上手模板
+# 只保留最常用的核心配置，其余字段自动回退使用 GUI 默认配置或系统默认值
+
+name: "精简快速配置"
+url: "http://127.0.0.1:5678/webhook-test/demo"
+method: "POST"
+
+auth:
+  type: "none"
+
+inputs:
+  - "./test_messages.txt"
+
+interactive: true
+markTest: true
+report: "./test_reports/latest.json"

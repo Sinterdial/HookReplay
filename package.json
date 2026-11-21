@@ -1,0 +1,36 @@
+{
+  "name": "hook-replay",
+  "private": true,
+  "version": "1.2.0",
+  "description": "HookReplay - 通用轻量 HTTP / Webhook 批量回放与调试桌面工作台",
+  "author": "Sinterdial",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sinterdial/HookReplay.git"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "package:release": "node scripts/package-release.mjs",
+    "sign:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sign-local.ps1"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-dialog": "^2.2.0",
+    "lucide-vue-next": "^0.468.0",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@tauri-apps/cli": "^2.2.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vue-tsc": "^2.2.0"
+  }
+}

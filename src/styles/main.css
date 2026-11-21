@@ -1,0 +1,597 @@
+/**
+ * HookReplay 全局样式与主题 Token 定义（Tailwind CSS v4）
+ *
+ * 设计亮点：
+ * 1. 支持浅色（Light）/ 深色（Dark）/ 跟随系统（System）三态无闪烁切换；
+ * 2. 支持自定义本机正文字体、代码等宽字体与全局字号实时注入；
+ * 3. Gemini 移动端风格流光动效体系（支持 rich / subtle / off 三档强度，自动响应 prefers-reduced-motion）；
+ * 4. 高对比度护眼 JSON 语法高亮与关键词突显样式。
+ */
+@import "tailwindcss";
+
+/* 将 Tailwind v4 dark: 变体绑定到 html.dark 类名，方便由 TS 统一托管 system/light/dark */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 注册用于旋转流光边界的可动画 CSS 自定义属性 */
+@property --aurora-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@layer base {
+  :root {
+    --bg-canvas: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-elevated: #f1f5f9;
+    --bg-hover: #e2e8f0;
+    --border-subtle: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --accent-primary: #4285f4;
+
+    /* 本机字体与字号可配置 Token */
+    --font-sans-default: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", system-ui, -apple-system, sans-serif;
+    --font-mono-default: "Cascadia Code", "JetBrains Mono", "Consolas", "Courier New", monospace;
+    --font-sans: var(--font-sans-default);
+    --font-mono: var(--font-mono-default);
+    --app-font-size: 14px;
+    --code-font-size: 13px;
+
+    color-scheme: light;
+  }
+
+  html.dark {
+    --bg-canvas: #0b101b;
+    --bg-surface: #131b2e;
+    --bg-elevated: #192338;
+    --bg-hover: #22304d;
+    --border-subtle: #1e293b;
+    --border-strong: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --accent-primary: #60a5fa;
+    color-scheme: dark;
+  }
+
+  html {
+    /* 以 14px 映射标准 16px rem 基准，11..22px 滑块等比例缩放全界面 */
+    font-size: calc(var(--app-font-size, 14px) + 2px);
+  }
+
+  html,
+  body,
+  #app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  /* 代码与 JSON 等宽字体栈 */
+  code,
+  pre,
+  textarea.font-mono,
+  input.font-mono,
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* 代码预览与源码编辑器专用独立字号控制类 */
+.code-editor-text {
+  font-family: var(--font-mono);
+  font-size: var(--code-font-size, 13px);
+  line-height: 1.6;
+}
+
+/* ===========================
+ * Gemini 移动端风格流光动效体系
+ * =========================== */
+@keyframes aurora-spin {
+  to {
+    --aurora-angle: 360deg;
+  }
+}
+
+@keyframes aurora-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 顶部全局 2px 流光饰条 */
+.aurora-top-bar {
+  height: 2.5px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    #4285f4,
+    #7c3aed,
+    #ec4899,
+    #10b981,
+    #3b82f6,
+    #4285f4
+  );
+  background-size: 300% 100%;
+  animation: aurora-flow 8s ease infinite;
+  opacity: 0.78;
+  transition: opacity 0.3s ease;
+}
+
+.aurora-top-bar.is-busy {
+  height: 3px;
+  opacity: 1;
+  animation: aurora-flow 2s linear infinite;
+}
+
+/* 旋转流光边框容器：用于首屏激活、交互等待确认横幅、正在执行卡片与模态弹窗 */
+.aurora-border-active {
+  position: relative;
+  border: 1.5px solid transparent !important;
+  background-clip: padding-box;
+  box-shadow:
+    0 0 24px -6px rgba(66, 133, 244, 0.38),
+    0 0 16px -6px rgba(217, 101, 112, 0.28);
+}
+
+.aurora-border-active::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--aurora-angle),
+    #4285f4,
+    #9b72cb,
+    #d96570,
+    #34a853,
+    #4285f4
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: aurora-spin 3.2s linear infinite;
+  will-change: transform;
+}
+
+/* 柔和常驻流光光环（品牌徽标 / 关键状态图标） */
+.aurora-ring-soft {
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.25),
+    0 0 16px -4px rgba(66, 133, 244, 0.32);
+}
+
+.aurora-ring-soft::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--aurora-angle),
+    rgba(66, 133, 244, 0.75),
+    rgba(155, 114, 203, 0.75),
+    rgba(217, 101, 112, 0.7),
+    rgba(52, 168, 83, 0.7),
+    rgba(66, 133, 244, 0.75)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: aurora-spin 6s linear infinite;
+}
+
+/* 顶部进度条专用流动彩虹渐变 */
+.aurora-progress {
+  background: linear-gradient(
+    90deg,
+    #4285f4,
+    #9b72cb,
+    #d96570,
+    #34a853,
+    #4285f4
+  );
+  background-size: 250% 100%;
+  animation: aurora-flow 2.4s ease infinite;
+}
+
+/* 主操作按钮轻流光渐变底色 */
+.aurora-btn {
+  background: linear-gradient(125deg, #2563eb, #7c3aed, #db2777, #2563eb);
+  background-size: 240% 240%;
+  animation: aurora-flow 6s ease infinite;
+  transition:
+    background-position 0.45s ease,
+    box-shadow 0.25s ease,
+    transform 0.12s ease;
+}
+
+.aurora-btn:hover:not(:disabled) {
+  animation-duration: 2.2s;
+  box-shadow:
+    0 6px 20px -4px rgba(124, 58, 237, 0.48),
+    0 0 12px -3px rgba(59, 130, 246, 0.35);
+}
+
+.aurora-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* 次级按钮悬浮流光边框 */
+.aurora-btn-subtle {
+  position: relative;
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease,
+    transform 0.12s ease;
+}
+
+.aurora-btn-subtle:hover:not(:disabled),
+.aurora-btn-subtle:focus-visible:not(:disabled) {
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.2),
+    0 4px 14px -4px rgba(66, 133, 244, 0.28),
+    0 2px 10px -4px rgba(217, 101, 112, 0.22);
+}
+
+.aurora-btn-subtle:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+/* 导航与页签激活流光底线 */
+.aurora-tab-active {
+  position: relative;
+  box-shadow: 0 2px 10px -4px rgba(99, 102, 241, 0.28);
+}
+
+.aurora-tab-active::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 0;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #4285f4, #9b72cb, #ec4899, #10b981, #4285f4);
+  background-size: 240% 100%;
+  animation: aurora-flow 4.5s ease infinite;
+}
+
+/* 交互卡片悬浮柔光 */
+.aurora-card-interactive {
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.25s ease,
+    transform 0.18s ease;
+}
+
+.aurora-card-interactive:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow:
+    0 6px 22px -10px rgba(66, 133, 244, 0.26),
+    0 2px 12px -6px rgba(155, 114, 203, 0.18);
+}
+
+/* 选中行左侧流光竖条 */
+.aurora-row-active {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    rgba(66, 133, 244, 0.14),
+    rgba(139, 92, 246, 0.08) 60%,
+    transparent
+  );
+}
+
+.aurora-row-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #4285f4, #9b72cb, #ec4899, #10b981);
+  background-size: 100% 240%;
+  animation: aurora-flow 4s ease infinite;
+}
+
+/* 胶囊切换开关流光悬浮 */
+.aurora-pill {
+  transition:
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.12s ease;
+}
+
+.aurora-pill:hover:not(:disabled) {
+  box-shadow:
+    0 0 14px -4px rgba(66, 133, 244, 0.36),
+    0 0 8px -3px rgba(168, 85, 247, 0.26);
+}
+
+/* 顶栏核心 URL 输入框聚焦时的柔和 Gemini 光晕 */
+.aurora-focus:focus-within {
+  border-color: transparent;
+  box-shadow:
+    0 0 0 1.5px rgba(99, 102, 241, 0.8),
+    0 0 18px -4px rgba(66, 133, 244, 0.38),
+    0 0 12px -4px rgba(217, 101, 112, 0.28);
+}
+
+/* Toast 通知轻微光晕 */
+.aurora-toast {
+  box-shadow:
+    0 10px 26px -8px rgba(15, 23, 42, 0.35),
+    0 0 16px -6px rgba(99, 102, 241, 0.32);
+}
+
+/* 流光强度档位：subtle（轻量）——收敛常驻动画，仅保留运行与交互焦点微光 */
+html[data-aurora="subtle"] .aurora-top-bar:not(.is-busy),
+html[data-aurora="subtle"] .aurora-ring-soft::before,
+html[data-aurora="subtle"] .aurora-btn,
+html[data-aurora="subtle"] .aurora-tab-active::after,
+html[data-aurora="subtle"] .aurora-row-active::before {
+  animation: none !important;
+}
+
+html[data-aurora="subtle"] .aurora-top-bar:not(.is-busy) {
+  opacity: 0.45;
+}
+
+/* 流光强度档位：off（关闭）——彻底关闭流光渐变与动画 */
+html[data-aurora="off"] .aurora-top-bar {
+  display: none;
+}
+
+html[data-aurora="off"] .aurora-border-active::before,
+html[data-aurora="off"] .aurora-ring-soft::before,
+html[data-aurora="off"] .aurora-tab-active::after,
+html[data-aurora="off"] .aurora-row-active::before {
+  animation: none !important;
+  background: var(--accent-primary) !important;
+}
+
+html[data-aurora="off"] .aurora-btn,
+html[data-aurora="off"] .aurora-progress {
+  animation: none !important;
+  background: var(--accent-primary) !important;
+}
+
+html[data-aurora="off"] .aurora-border-active,
+html[data-aurora="off"] .aurora-ring-soft,
+html[data-aurora="off"] .aurora-btn-subtle:hover,
+html[data-aurora="off"] .aurora-card-interactive:hover,
+html[data-aurora="off"] .aurora-pill:hover,
+html[data-aurora="off"] .aurora-focus:focus-within,
+html[data-aurora="off"] .aurora-edge-tab:hover {
+  box-shadow: none !important;
+}
+
+html[data-aurora="off"] .aurora-resizer-bar {
+  animation: none !important;
+  background: var(--accent-primary) !important;
+}
+
+/* 无障碍：系统要求减少动态效果时冻结所有旋转与流动 */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-top-bar,
+  .aurora-border-active::before,
+  .aurora-ring-soft::before,
+  .aurora-progress,
+  .aurora-btn,
+  .aurora-tab-active::after,
+  .aurora-row-active::before,
+  .aurora-resizer-bar {
+    animation: none !important;
+  }
+}
+
+/* ===========================
+ * 分栏拖动与 Notion 风格悬浮抽屉
+ * =========================== */
+body.is-resizing-pane,
+body.is-resizing-pane * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.aurora-resizer-bar {
+  background: linear-gradient(
+    180deg,
+    rgba(66, 133, 244, 0.85),
+    rgba(139, 92, 246, 0.9),
+    rgba(236, 72, 153, 0.85),
+    rgba(16, 185, 129, 0.85),
+    rgba(66, 133, 244, 0.85)
+  );
+  background-size: 100% 240%;
+  animation: aurora-flow 4s ease infinite;
+}
+
+.aurora-resizer-bar.is-active {
+  animation-duration: 1.8s;
+  box-shadow:
+    0 0 12px rgba(99, 102, 241, 0.55),
+    0 0 6px rgba(236, 72, 153, 0.35);
+}
+
+.floating-drawer {
+  box-shadow:
+    0 18px 42px -12px rgba(15, 23, 42, 0.24),
+    0 6px 18px -6px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(148, 163, 184, 0.14);
+}
+
+html.dark .floating-drawer {
+  box-shadow:
+    0 22px 50px -10px rgba(2, 6, 23, 0.72),
+    0 8px 20px -6px rgba(2, 6, 23, 0.45),
+    0 0 0 1px rgba(148, 163, 184, 0.14);
+}
+
+.aurora-edge-tab:hover {
+  border-color: rgba(99, 102, 241, 0.65);
+  box-shadow:
+    0 0 14px -3px rgba(66, 133, 244, 0.42),
+    0 2px 8px -2px rgba(168, 85, 247, 0.28);
+}
+
+/* ===========================
+ * JSON 语法高亮与关键词突显
+ * =========================== */
+.json-key {
+  color: #0369a1;
+  font-weight: 500;
+}
+
+.json-key-important {
+  color: #7c3aed;
+  font-weight: 700;
+  background-color: rgba(124, 58, 237, 0.11);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.json-string {
+  color: #047857;
+}
+
+.json-number {
+  color: #c2410c;
+  font-weight: 500;
+}
+
+.json-boolean {
+  color: #be185d;
+  font-weight: 600;
+}
+
+.json-null {
+  color: #64748b;
+  font-style: italic;
+}
+
+.json-punct {
+  color: #64748b;
+}
+
+.json-comment {
+  color: #64748b;
+  font-style: italic;
+}
+
+.json-search-hit {
+  background-color: rgba(250, 204, 21, 0.45);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.json-search-hit-current {
+  background-color: #f97316;
+  color: #ffffff;
+  outline: 1.5px solid #ea580c;
+}
+
+html.dark .json-key {
+  color: #7dd3fc;
+}
+
+html.dark .json-key-important {
+  color: #e9d5ff;
+  background-color: rgba(168, 85, 247, 0.26);
+}
+
+html.dark .json-string {
+  color: #6ee7b7;
+}
+
+html.dark .json-number {
+  color: #fdba74;
+}
+
+html.dark .json-boolean {
+  color: #f472b6;
+}
+
+html.dark .json-null {
+  color: #94a3b8;
+}
+
+html.dark .json-punct {
+  color: #94a3b8;
+}
+
+html.dark .json-comment {
+  color: #94a3b8;
+}
+
+html.dark .json-search-hit {
+  background-color: rgba(234, 179, 8, 0.35);
+}
+
+html.dark .json-search-hit-current {
+  background-color: #ea580c;
+  color: #ffffff;
+}
+
+/* ===========================
+ * 桌面端细腻自定义滚动条
+ * =========================== */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
