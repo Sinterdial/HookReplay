@@ -1,4 +1,8 @@
 # HookReplay · 通用 HTTP / Webhook 批量回放与调试工作台
+
+> 一款**双击即开、关窗即退、平时零后台占用**的 **Windows 10 / 11 (x64)** 轻量级桌面应用（基于 Tauri v2 + Rust + Vue 3，[Apache-2.0](./LICENSE) 开源，Publisher: **Sinterdial**），兼顾 **n8n 工作流日志分段回放** 与 **通用 Webhook / REST API 批量调试**。版本变更详见 [CHANGELOG.md](./CHANGELOG.md)。
+
+> **平台支持说明**：当前预编译发布与 CI 验证针对 **Windows 10 / 11 (x64)**（依赖系统内置 Edge WebView2 运行时）；字体枚举与启动容错对非 Windows 平台已预留条件编译适配。
 <p align="center">
   <a href="https://github.com/Sinterdial/HookReplay/stargazers"><img alt="GitHub Stars" src="https://img.shields.io/github/stars/Sinterdial/HookReplay?style=flat-square&color=EAB308" /></a>
   <a href="https://github.com/Sinterdial/HookReplay/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Sinterdial/HookReplay?style=flat-square&color=6366F1" /></a>
@@ -6,10 +10,6 @@
   <img alt="Last Commit" src="https://img.shields.io/github/last-commit/Sinterdial/HookReplay?style=flat-square&color=10B981" />
   <a href="https://linux.do"><img alt="LINUX DO" src="https://img.shields.io/badge/LINUX%20DO-Community-F59E0B?style=flat-square" /></a>
 </p>
-
-> 一款**双击即开、关窗即退、平时零后台占用**的 **Windows 10 / 11 (x64)** 轻量级桌面应用（基于 Tauri v2 + Rust + Vue 3，[Apache-2.0](./LICENSE) 开源，Publisher: **Sinterdial**），兼顾 **n8n 工作流日志分段回放** 与 **通用 Webhook / REST API 批量调试**。版本变更详见 [CHANGELOG.md](./CHANGELOG.md)。
-
-> **平台支持说明**：当前预编译发布与 CI 验证针对 **Windows 10 / 11 (x64)**（依赖系统内置 Edge WebView2 运行时）；字体枚举与启动容错对非 Windows 平台已预留条件编译适配。
 
 ---
 
