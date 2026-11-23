@@ -5,6 +5,21 @@
 > **平台支持说明**：当前预编译发布与 CI 验证针对 **Windows 10 / 11 (x64)**（依赖系统内置 Edge WebView2 运行时）；字体枚举与启动容错对非 Windows 平台已预留条件编译适配。
 
 ---
+<p align="center">
+  <a href="https://github.com/Sinterdial/HookReplay/stargazers">
+    <img alt="GitHub Stars" src="https://img.shields.io/github/stars/Sinterdial/HookReplay?style=flat-square&color=EAB308" />
+  </a>
+  <a href="https://github.com/Sinterdial/HookReplay/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/Sinterdial/HookReplay?style=flat-square&color=6366F1" />
+  </a>
+  <img alt="Top Language" src="https://img.shields.io/github/languages/top/Sinterdial/HookReplay?style=flat-square&color=0EA5E9" />
+  <img alt="Last Commit" src="https://img.shields.io/github/last-commit/Sinterdial/HookReplay?style=flat-square&color=10B981" />
+  <a href="https://linux.do">
+    <img alt="LINUX DO" src="https://img.shields.io/badge/LINUX%20DO-Community-F59E0B?style=flat-square" />
+  </a>
+</p>
+
+---
 
 ## 核心特性
 
